@@ -49,7 +49,7 @@ ${HARDHAT_ABIJSONS}: hardhat/package-lock.json | ${HARDHAT}
 	cd hardhat && npx hardhat compile --force
 
 ${EXAMPLES_ABIJSONS}: examples/package-lock.json | ${HARDHAT}
-	cd examples && npx hardhat compile --force
+	cd examples && npm install @openzeppelin/contracts @openzeppelin/contracts-upgradeable && npx hardhat compile --force
 
 %.go: %.json | ${ABIGEN}
 	${ABIGEN} \
@@ -77,8 +77,8 @@ ENV_FILE ?= hardhat/.env
 ifeq ($(shell cat ${ENV_FILE} | grep WALLET_PRIVATE_KEY),)
 $(warning No WALLET_PRIVATE_KEY in ${ENV_FILE})
 endif
-ifeq ($(shell cat ${ENV_FILE} | grep CONTRACT_ADDRESS),)
-$(warning No CONTRACT_ADDRESS in ${ENV_FILE})
+ifeq ($(shell cat ${ENV_FILE} | grep DEPLOYED_CONTRACT),)
+$(warning No DEPLOYED_CONTRACT in ${ENV_FILE})
 endif
 
 .PHONY: deploy
