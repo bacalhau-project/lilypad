@@ -3,6 +3,7 @@ package bridge
 import (
 	"context"
 	"fmt"
+	"os"
 	"time"
 
 	"github.com/filecoin-project/bacalhau/pkg/job"
@@ -182,7 +183,10 @@ var _ JobRunner = (*bacalhauRunner)(nil)
 // Returns a real job runner that will make real requests against the Bacalhau network.
 func NewJobRunner() JobRunner {
 	apiPort := 1234
-	apiHost := "35.245.115.191"
+	apiHost := os.Getenv("BACALHAU_API_HOST")
+	if apiHost == "" {
+		apiHost = "35.245.115.191"
+	}
 	client := publicapi.NewRequesterAPIClient(fmt.Sprintf("http://%s:%d", apiHost, apiPort))
 	return &bacalhauRunner{Client: client}
 }
