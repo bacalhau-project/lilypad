@@ -13,6 +13,8 @@
     "hardhat": "^2.12.7"
   },
   "dependencies": {
+    "@openzeppelin/contracts": "^4.8.2",
+    "@openzeppelin/contracts-upgradeable": "^4.8.2",
     "lilypad": "file:../hardhat"
   }
 }

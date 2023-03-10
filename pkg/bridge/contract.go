@@ -5,6 +5,7 @@ import (
 	"crypto/ecdsa"
 	"fmt"
 	"math/big"
+	"os"
 	"time"
 
 	"github.com/bacalhau-project/lilypad/hardhat/artifacts/contracts/LilypadEvents.sol"
@@ -156,7 +157,12 @@ func (r *realContract) ReadLogs(ctx context.Context, out chan<- ContractSubmitte
 	logs, err := r.contract.LilypadEventsFilterer.FilterNewBacalhauJobSubmitted(&opts)
 	if err != nil {
 		log.Ctx(ctx).Error().Err(err).Send()
-		return
+		// if we have an error here we should exit and restart
+		// this avoids problems if the network is down and we are holding onto a previous
+		// block number that is later than 24 hours and we get into a death loop
+		// if the network is down or for whatever other reason we are unable
+		// to list the events we should exit and restart to try and start again
+		os.Exit(1)
 	}
 	defer logs.Close()
 
