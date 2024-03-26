@@ -26,7 +26,7 @@ Block explorer URL: (leave blank)
 
 ### Fund your wallet with ETH and LP
 
-To obtain funds, go to [http://faucet.lilypad.tech:8080](http://faucet.lilypad.tech:8080)
+To obtain funds, go to [https://faucet.lilypad.tech](https://faucet.lilypad.tech).
 
 The faucet will give you both ETH (to pay for gas) and LP (to stake and pay for jobs).
 
@@ -34,9 +34,9 @@ The faucet will give you both ETH (to pay for gas) and LP (to stake and pay for 
 
 Download the latest release of Lilypad for your platform. Both the amd64/x86_64 and arm64 variants of macOS and Linux are supported. (If you are on Apple Silicon, you'll want arm64). 
 
-Nb:  to check your version use ```which lilypad``` - if an old version run ```rm <path>``` to remove that path then reinstall newest version
+Nb: to check your version use ```which lilypad``` - if you're an old version run ```rm <path>``` to remove it, then install the newest version. You'll want to stay up-to-date to remain compatible with Lilypad as it evolves.
 
-The commands below will automatically detect your OS and processor architecture and download the correct Lilypad build for your machine.
+The commands below will automatically detect your computer's OS and processor architecture and download the correct Lilypad build for your machine.
 
 ```
 # Detect your machine's architecture and set it as $OSARCH
@@ -44,7 +44,7 @@ OSARCH=$(uname -m | awk '{if ($0 ~ /arm64|aarch64/) print "arm64"; else if ($0 ~
 # Detect your operating system and set it as $OSNAME
 OSNAME=$(uname -s | awk '{if ($1 == "Darwin") print "darwin"; else if ($1 == "Linux") print "linux"; else print "unsupported_os"}') && export OSNAME;
 ```
-Then Download & Install
+Then, download & install:
 ```
 # Download the latest production build
 curl -sSL -o lilypad https://github.com/lilypad-tech/lilypad/releases/download/v2.0.0-d63a7ff/lilypad-$OSNAME-$OSARCH
@@ -62,27 +62,19 @@ export WEB3_PRIVATE_KEY=<your private key>
 ```
 (or arrange for the key to be in your environment in a more secure way that doesn't get written to your shell history)
 
-
 ### Cows
-
 ```
 lilypad run cowsay:v0.0.1 -i Message="moo"
 ```
 
-
 ### SDXL
-
 ```
 lilypad run sdxl:v0.9-lilypad1 -i PromptEnv="PROMPT=beautiful view of iceland with a record player"
 ```
 
 ![image-42](https://github.com/lilypad-tech/lilypad/assets/264658/d48bb897-79a0-4f3a-b938-e85a8cfa3f0e)
 
-Not working?
-Try ```rm -rf /tmp/lilypad/data/repos``` uninstall lilypad path and reinstall from the start
-
 ## Run a node, earn LP
-
 ```
 lilypad serve
 ```
@@ -103,21 +95,21 @@ Check the github releases page for each module or just use the git hash as the t
 * [wasm](https://github.com/lilypad-tech/lilypad-module-wasm)
 * [cowsay](https://github.com/lilypad-tech/lilypad-module-cowsay)
 
-
 ## Write a module
 
-A module is just a git repo.
+A module is just a Git repository with job information, usually associated with a Docker container.
 
-Module versions are just git tags.
+Module versions are based on tags.
 
-In your repo, create a file called `lilypad_module.json.tmpl`
+In your repository, create a file called `lilypad_module.json.tmpl`
 
-See [cowsay](https://github.com/lilypad-tech/lilypad-module-cowsay) for example
+See [cowsay](https://github.com/lilypad-tech/lilypad-module-cowsay) for example.
 
-This is a json template with Go text/template style `{{.Message}}` sections which will be replaced by Lilypad with json encoded inputs to modules. You can also do fancy things with go templates like setting defaults, see cowsay for example. While developing a module, you can use the git hash to test it.
+This is a JSON template with Go text/template style `{{.Message}}` sections which will be replaced by Lilypad with json encoded inputs to modules. You can also do fancy things with Go templates like setting defaults, see cowsay for example. 
+
+While developing a module, you can use the git hash to test it.
 
 Pass inputs as:
-
 ```
 lilypad run github.com/username/repo:tag -i Message=moo
 ```
@@ -134,23 +126,9 @@ Tips:
 
 If your module is not deterministic, compute providers will not adopt it and blacklist your module
 
-.### Writing Advanced Modules
+### Module-Next
+We've got a new style of setting environment variables (and other useful templating) to allow for injection of user-provided variables without allowing unsafe text.
 
-1. `subt`:
-The `subt` function allows for substitutions in your template, a feature that addresses the issue outlined in [#14](https://github.com/lilypad-tech/lilypad/issues/14).
+`"{{ if .Prompt }}{{ subst "PROMPT=%s" .Prompt }}{{ end }}",`
 
-This function is a workaround for the lack of direct substitution support in the module. It implements the [printf](https://pkg.go.dev/text/template#Template.Funcs) function under the hood, which allows you to format strings with placeholders.
-
-<details>
-  <summary> 
-    Usage   
-  </summary>
-    The `subt` function can be used in the same way as the `printf` function in Go. You pass in a format string, followed by values that correspond to the placeholders in the format string.
-    ```
-    const templateText = `
-    {{ subt "Hello %s" .name }}
-    `
-    ```
-</details>
-
-[Example Code](https://go.dev/play/p/oBgc2Cetug3)
+This example will insert the contents of Prompt (`-i Prompt="some prompt"`) as the environment variable $PROMPT.
